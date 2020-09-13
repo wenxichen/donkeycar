@@ -260,7 +260,7 @@ sudo i2cdetect -y 1
 <h2 id="sombrero-setup">Sombrero Setup</h2>
 <p>Set <code>HAVE_SOMBRERO = True</code> in your <strong>myconfig.py</strong> if you have a sombrero board.</p>
 <h2 id="robo-hat-mm1-setup">Robo HAT MM1 Setup</h2>
-<p>Set <code>HAVE_ROBOHAT = True</code> in your <strong>myconfig.py</strong> if you have a Robo HAT MM1 board.   Also set the following variables according to your setup.  Most people will be using the below values, however, if you are using a Jetson Nano, please set <code>MM1_SERIAL_PORT = '/dev/ttyTHS1'</code></p>
+<p>Set <code>HAVE_ROBOHAT = True</code> in your <strong>myconfig.py</strong> if you have a Robo HAT MM1 board. Also set the following variables according to your setup.  Most people will be using the below values, however, if you are using a Jetson Nano, please set <code>MM1_SERIAL_PORT = '/dev/ttyTHS1'</code></p>
 <pre><code class="python3">#ROBOHAT MM1
 HAVE_ROBOHAT = False            # set to true when using the Robo HAT MM1 from Robotics Masters.  This will change to RC Control.
 MM1_STEERING_MID = 1500         # Adjust this value if your car cannot run in a straight line
@@ -276,6 +276,11 @@ MM1_SHOW_STEERING_VALUE = False
 # -- MacOS/Linux:please use 'ls /dev/tty.*' to find the correct serial port for mm1 
 #  eg.'/dev/tty.usbmodemXXXXXX' and replace the port accordingly
 MM1_SERIAL_PORT = '/dev/ttyS0'  # Serial Port for reading and sending MM1 data (raspberry pi default)
+
+# adjust controller type as Robohat MM1
+CONTROLLER_TYPE='MM1'
+# adjust drive train for web interface
+DRIVE_TRAIN_TYPE = 'MM1'
 </code></pre>
 
 <p>The Robo HAT MM1 uses a RC Controller and CircuitPython script to drive the car during training. You must put the CircuitPython script onto the Robo HAT MM1 with your computer before you can continue.</p>
