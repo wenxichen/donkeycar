@@ -76,6 +76,8 @@
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../guide/train_autopilot/">Train an autopilot.</a>
                     </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../../guide/dataset_pretrained_models/">Dataset and pre-trained models</a>
+                    </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../guide/simulator/">Donkey Simulator.</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../guide/virtual_race_league/">Virtual Race League.</a>
@@ -261,7 +263,7 @@
                 <h1 id="keras-parts">Keras Parts</h1>
 <p>These parts encapsulate models defined using the <a href="https://keras.io/">Keras</a> high level api. They are intended to be used with the Tensorflow backend. The parts are designed to use the trained artificial neural network to reproduce the steering and throttle given the image the camera sees. They are created by using the <a href="/guide/train_autopilot/">train command</a>.</p>
 <h2 id="keras-categorical">Keras Categorical</h2>
-<p>This model type is created with the <code>--type=catagorical</code>. </p>
+<p>This model type is created with the <code>--type=categorical</code>. </p>
 <p>The <code>KerasCategorical</code> pilot breaks the steering and throttle decisions into discreet angles and then uses categorical cross entropy to train the network to activate a single neuron for each steering and throttle choice. This can be interesting because we get the confidence value as a distribution over all choices.
 This uses the <code>dk.utils.linear_bin</code> and <code>dk.utils.linear_unbin</code> to transform continuous real numbers into a range of discreet values for training and runtime.
 The input and output are therefore bounded and must be chosen wisely to match the data.
