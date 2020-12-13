@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple, cast
 
 from donkeycar.parts.tflite import keras_model_to_tflite
-from donkeycar.pipeline.sequence import TubRecord
+from donkeycar.pipeline.sequence import TubRecord, Pipeline
 from donkeycar.pipeline.sequence import TubSequence
 from donkeycar.pipeline.types import TubDataset
 from donkeycar.pipeline.augmentations import ImageAugmentation
@@ -26,9 +26,12 @@ class BatchSequence(object):
         self.batch_size = self.config.BATCH_SIZE
         self.is_train = is_train
         self.augmentation = ImageAugmentation(config)
-        self.pipeline = self.sequence.build_pipeline(
-                x_transform=self.model.x_transform,
-                y_transform=self.model.y_transform)
+        # self.pipeline = self.sequence.build_pipeline(
+        #         x_transform=self.model.x_transform,
+        #         y_transform=self.model.y_transform)
+        self.pipeline = Pipeline(self.sequence,
+                                 x_transform=self.model.x_transform,
+                                 y_transform=self.model.y_transform)
         self.pipeline_out = self._make_pipeline()
         self.types = self.model.output_types()
         self.shapes = self.model.output_shapes()
@@ -42,17 +45,23 @@ class BatchSequence(object):
         # 1. We use image augmentation, it might do nothing, if there is no
         # augmentation in the config. It also does nothing in validation.
         # This works on uint8 images.
-        pipeline_augment = self.sequence.map_pipeline(
-            pipeline=self.pipeline,
-            x_transform=lambda x: self.augmentation.augment(x) if
-                                  self.is_train else x,
-            y_transform=lambda y: y)
-
-        # 2. we scale images to normalised float64 to be model inputs
-        pipeline_normalise = list(self.sequence.map_pipeline(
-            pipeline=pipeline_augment,
-            x_transform=lambda x: normalize_image(x),
-            y_transform=lambda y: y))
+        x_trafo = lambda x: self.augmentation.augment(x) if self.is_train else x
+        # pipeline_augment = self.sequence.map_pipeline_factory(
+        #     x_transform=x_trafo
+        #     y_transform=lambda y: y,
+        #     factory=lambda: self.pipeline)
+        pipeline_augment = Pipeline(self.pipeline,
+                                    x_transform=x_trafo,
+                                    y_transform=lambda y: y)
+        #
+        # # 2. we scale images to normalised float64 to be model inputs
+        # pipeline_normalise = self.sequence.map_pipeline_factory(
+        #     x_transform=lambda x: normalize_image(x),
+        #     y_transform=lambda y: y,
+        #     factory=lambda: pipeline_augment)
+        pipeline_normalise = Pipeline(pipeline_augment,
+                                      x_transform=lambda x: normalize_image(x),
+                                      y_transform=lambda y: y)
 
         return pipeline_normalise
 

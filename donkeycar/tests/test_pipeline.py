@@ -4,7 +4,8 @@ from os import pipe
 from typing import List, Tuple, cast
 
 import numpy as np
-from donkeycar.pipeline.sequence import SizedIterator, TubSequence, Reshaper
+from donkeycar.pipeline.sequence import SizedIterator, TubSequence, Reshaper,\
+    Pipeline
 from donkeycar.pipeline.types import TubRecord, TubRecordDict
 
 
@@ -12,7 +13,7 @@ def random_records(size: int = 100) -> List[TubRecord]:
     return [random_record() for _ in range(size)]
 
 
-def random_record():
+def random_record() -> TubRecord:
     now = int(time.time())
     underlying: TubRecordDict = {
         'cam/image_array': f'/path/to/{now}.txt',
@@ -163,6 +164,29 @@ class TestPipeline(unittest.TestCase):
             count += 1
 
         self.assertEqual(count, len(batched))
+
+    def test_iterator_consistency(self):
+        extract = Pipeline(
+            self.sequence,
+            x_transform=lambda record: record.underlying['user/angle'],
+            y_transform=lambda record: record.underlying['user/throttle'])
+        # iterate twice through half the data
+        r1 = list()
+        r2 = list()
+        for r in r1, r2:
+            iterator = iter(extract)
+            for i in range(size // 2):
+                r.append(next(iterator))
+
+        self.assertEqual(r1, r2)
+        # now transform and iterate through pipeline twice to see iterator
+        # doesn't exhaust
+        transformed = Pipeline(extract,
+                               x_transform=lambda x: 2 * x,
+                               y_transform=lambda y: 3 * y)
+        l1 = list(transformed)
+        l2 = list(transformed)
+        self.assertEqual(l1, l2)
 
 
 if __name__ == '__main__':

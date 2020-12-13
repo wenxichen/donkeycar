@@ -32,7 +32,7 @@ class TubRecord(object):
         self.underlying = underlying
         self._image: Optional[Any] = None
 
-    def image(self, cached=True, normalize=False) -> np.ndarray:
+    def image(self, cached=True) -> np.ndarray:
         if self._image is None:
             image_path = self.underlying['cam/image_array']
             full_path = os.path.join(self.base_path, 'images', image_path)

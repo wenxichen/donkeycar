@@ -1,4 +1,5 @@
-from typing import Any, Callable, Generic, Iterable, Iterator, List, Sized, Tuple, TypeVar
+from typing import Any, Callable, Generic, Iterable, Iterator, List, Sized, \
+    Tuple, TypeVar, Generator
 
 import math
 import numpy as np
@@ -217,24 +218,22 @@ class Reshaper(Generic[R1, R2], SizedIterator[Tuple[np.ndarray, np.ndarray]]):
     next = __next__
 
 
-
 class Pipeline:
     def __init__(self,
-                 sequence: TubSequence,
-                 x_transform: Callable[[TubRecord], X],
-                 y_transform: Callable[[TubRecord], Y]) -> None:
-        super().__init__()
+                 sequence: Iterator[R],
+                 x_transform: Callable[[R], XOut],
+                 y_transform: Callable[[R], YOut]) -> None:
         self.sequence = sequence
         self.x_transform = x_transform
         self.y_transform = y_transform
 
-    def __iter__(self) -> Iterator[Tuple[X, Y]]:
+    def __iter__(self) -> Iterator[Tuple[XOut, YOut]]:
         for record in self.sequence:
-            yield self.x_transform(record), self.y_transform(record)
+            if type(record) is tuple:
+                x, y = record
+                yield self.x_transform(x), self.y_transform(y)
+            else:
+                yield self.x_transform(record), self.y_transform(record)
 
     def __len__(self) -> int:
         return len(self.sequence)
-
-    def __getitem__(self, item):
-        record = self.sequence[item]
-        return self.x_transform(record), self.y_transform(record)
