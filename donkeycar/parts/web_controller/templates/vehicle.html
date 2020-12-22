@@ -116,8 +116,24 @@
       </div><!-- end right col -->
     </div>
     <div id="joystick-padding"></div>
+
+    <!-- Text Controller -->
+    <div class="row">
+      <div class="col-xs-8 col-sm-5 col-md-5">
+        <form onsubmit="textControl(this); return false">
+          <label>Control by Texting</label>
+          <input type="text" id="tcontrol" name="tcontrol">
+          <input type="submit" value="Submit">
+        </form>
+        <div id="text_history">
+          
+        </div>
+      </div>
+    </div><!-- END Text Controller -->
     
   </div> <!-- END Container -->
+
+
   <footer class="footer" id="vehicle_footer">
     <div class="container">
       <div class="row">

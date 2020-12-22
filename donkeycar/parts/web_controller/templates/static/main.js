@@ -73,15 +73,19 @@ var driveHandler = new function() {
     var setBindings = function() {
 
       $(document).keydown(function(e) {
-          if(e.which == 32) { toggleBrake() }  // 'space'  brake
-          if(e.which == 82) { toggleRecording() }  // 'r'  toggle recording
-          if(e.which == 73) { throttleUp() }  // 'i'  throttle up
-          if(e.which == 75) { throttleDown() } // 'k'  slow down
-          if(e.which == 74) { angleLeft() } // 'j' turn left
-          if(e.which == 76) { angleRight() } // 'l' turn right
-          if(e.which == 65) { updateDriveMode('auto') } // 'a' turn on auto mode
-          if(e.which == 68) { updateDriveMode('user') } // 'd' turn on manual mode
-          if(e.which == 83) { updateDriveMode('auto_angle') } // 'a' turn on auto mode
+          if (e.target.nodeName == 'INPUT' && e.target.id == 'tcontrol') {
+            return;
+          } else {
+            if(e.which == 32) { toggleBrake() }  // 'space'  brake
+            if(e.which == 82) { toggleRecording() }  // 'r'  toggle recording
+            if(e.which == 73) { throttleUp() }  // 'i'  throttle up
+            if(e.which == 75) { throttleDown() } // 'k'  slow down
+            if(e.which == 74) { angleLeft() } // 'j' turn left
+            if(e.which == 76) { angleRight() } // 'l' turn right
+            if(e.which == 65) { updateDriveMode('auto') } // 'a' turn on auto mode
+            if(e.which == 68) { updateDriveMode('user') } // 'd' turn on manual mode
+            if(e.which == 83) { updateDriveMode('auto_angle') } // 'a' turn on auto mode
+          }
       });
 
       $('#mode_select').on('change', function () {
@@ -624,3 +628,15 @@ function remap( x, oMin, oMax, nMin, nMax ){
 return result;
 }
 
+var textHistory = [];
+
+function textControl(form) {
+  var tcontrolInput = form.elements["tcontrol"].value;
+  console.log('Receive text control input: ' + tcontrolInput);
+  form.elements["tcontrol"].value = "";
+
+  // add input into text history
+  textHistory.push(tcontrolInput);
+  var historyHolder = document.getElementById("text_history");
+  historyHolder.innerHTML += "<p>" + tcontrolInput + "</p>";
+}
