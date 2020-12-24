@@ -33,6 +33,7 @@ var driveHandler = new function() {
     var vehicle_id = ""
     var driveURL = ""
     var socket
+    var textHistory = [];
 
     this.load = function() {
       driveURL = '/drive'
@@ -67,7 +68,78 @@ var driveHandler = new function() {
         console.log("Device Orientation not supported by browser, setting control mode to joystick.");
         state.controlMode = 'joystick';
       }
+
+      bindTextControl()
+
     };
+
+    var bindTextControl = function() {
+
+      $("#text_input_form").submit(function(e){
+        var tcontrolInput = this.elements["tcontrol"].value;
+        console.log('Receive text control input: ' + tcontrolInput);
+        this.elements["tcontrol"].value = "";
+
+        // add input into text history
+        textHistory.push(tcontrolInput);
+        var historyHolder = document.getElementById("text_history");
+        historyHolder.innerHTML += "<p>" + tcontrolInput + "</p>";
+
+        // control the car
+        var inputTokens = tcontrolInput.toLowerCase().split(" ");
+        console.log('Tokenized input:: ' + inputTokens);
+        moveByTokens(inputTokens);
+
+        e.preventDefault();
+      })
+    }
+
+    var moveByTokens = function(tokens) {
+
+      if (tokens.length == 1) {
+        switch (tokens[0]) {
+          case "back":
+            throttleDownForSeconds(3);
+            break;
+          case "forward":
+            throttleUpForSeconds(3);
+            break;
+        }
+      }
+      //  else if (inputTokens.length == 2) {
+      //   return false;
+      // }
+    }
+
+    // var postDriveWithoutUIUpdate = function() {
+
+    //   //Send angle and throttle values
+    //   data = JSON.stringify({ 'angle': state.tele.user.angle,
+    //                           'throttle':state.tele.user.throttle,
+    //                           'drive_mode':state.driveMode,
+    //                           'recording': state.recording});
+    //   console.log(data);
+    //   // $.post(driveURL, data)
+    //   socket.send(data);
+    // }
+
+    var stopInFull = function() {
+      state.tele.user.angle = 0;
+      state.tele.user.throttle = 0;
+      postDrive();
+    }
+
+    var throttleUpForSeconds = function(sec) {
+      state.tele.user.throttle = 0.5;
+      postDrive();
+      setTimeout(stopInFull, sec*1000);
+    }
+
+    var throttleDownForSeconds = function(sec) {
+      state.tele.user.throttle = 0.5;
+      postDrive();
+      setTimeout(stopInFull, sec*1000);
+    }
 
 
     var setBindings = function() {
@@ -626,17 +698,4 @@ function remap( x, oMin, oMax, nMin, nMax ){
   }
 
 return result;
-}
-
-var textHistory = [];
-
-function textControl(form) {
-  var tcontrolInput = form.elements["tcontrol"].value;
-  console.log('Receive text control input: ' + tcontrolInput);
-  form.elements["tcontrol"].value = "";
-
-  // add input into text history
-  textHistory.push(tcontrolInput);
-  var historyHolder = document.getElementById("text_history");
-  historyHolder.innerHTML += "<p>" + tcontrolInput + "</p>";
 }
